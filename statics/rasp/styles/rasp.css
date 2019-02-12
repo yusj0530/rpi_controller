@@ -1,0 +1,14 @@
+.arduino-alert-bar {
+	display:block;
+	padding:20px 0;
+	font-size:1.5em;
+}
+
+#alert-approach {
+	margin:0px 10px 10px 10px;
+}
+
+#alert-intrusion {
+	margin:0px 10px 0 10px;
+}
+

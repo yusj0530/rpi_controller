@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>라즈베리 제어하기</title>
+<link href="assets/bootstrap/css/bootstrap.min.css" type="text/css" rel="stylesheet">
+<link href="assets/bootstrap-switch/css/bootstrap3/bootstrap-switch.min.css" type="text/css" rel="stylesheet">
+<link href="assets/jqwidgets/styles/jqx.base.css" type="text/css" rel="stylesheet" />
+<link href="assets/rasp/styles/rasp.css" type="text/css" rel="stylesheet" />
+<style type="text/css">
+	.gauge{ background-color: #333; width:150px; height:150px;}
+	.switch{background-color: #833;}
+</style>
+<script type="text/javascript" src="assets/jquery/jquery-2.1.4.js"></script>
+<script type="text/javascript" src="assets/bootstrap/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="assets/bootstrap-switch/js/bootstrap-switch.js"></script>
+<script type="text/javascript" src="/assets/jqwidgets/jqxcore.js"></script>
+<script type="text/javascript" src="/assets/jqwidgets/jqxchart.js"></script>
+<script type="text/javascript" src="/assets/jqwidgets/jqxgauge.js"></script>    	
+<script type="text/javascript" src="assets/rasp/js/rasp.js"></script>
+   
+<script type="text/javascript">
+
+$(function(){
+	$('#thermometer, #thermometer2, #thermometer3').jqxGauge({
+		width : 200,
+		height : 200,
+		min : -20,
+		max : 50,
+		ranges : [ {
+			startValue : -20,
+			endValue : 0,
+			style : {
+				fill : '#e2e2e2'}
+		}, {
+			startValue : 0,
+			endValue : 10,
+			style : {
+				fill : '#00ccff'},
+		}, {
+			startValue : 10,
+			endValue : 25,
+			style : {
+				fill : '#4cb848'},
+		}, {
+			startValue : 25,
+			endValue : 35,
+			style : {
+				fill : '#fad00b'},
+		}, {
+			startValue : 35,
+			endValue : 50,
+			style : {
+				fill : '#e53d37'},
+		} ],
+		labels : {
+			position : 'outside'},
+		animationDuration : 500,
+		border : {
+			visible : false},
+		caption : {
+			value : '온도 : 0°C'}
+	});
+	$('#hygrometer').jqxGauge({
+		width : 150,
+		height : 150,
+		min : 0,
+		max : 100,
+		border : { 
+			visible : false
+		},
+		caption : {
+			value : '습도 : 68%'
+		},
+		value : 68
+	});
+
+});
+
+setInterval(function(){
+	$.ajax({
+		url: "/hygrometer",
+		type: "get",
+		dataType: "json",
+		data: "",
+		success: function(response){
+			console.log(response)
+			$('#hygrometer').jqxGauge({
+				caption: {
+					value: '습도 :' + response.hygrometer + '%'
+				}
+			});
+			$('#hygrometer').jqxGauge('setValue', response.hygrometer);
+		},
+		error: function(xhr, status, e){
+			console.error(status + ":" + e);
+		}
+	});
+}, 1000);
+	
+setInterval(function() {
+	$.ajax({
+		url: "/thermometer",
+		type: "get",
+		dataType: "json",
+		data: "",
+		success: function(response){
+			console.log(response)
+			$('#thermometer').jqxGauge({
+				caption: {
+					value: '온도 :' + response.thermometer + '°C'
+				}
+			});
+			$('#thermometer').jqxGauge('setValue', response.thermometer);
+		},
+		error: function(xhr, status, e){
+			console.error(status + ":" + e);
+		}
+	});
+}, 1000);	
+
+
+
+</script>
+
+</head>
+<body>
+<div class="container">
+	<h1>RaspberryPi Controller</h1>
+	<p><small>&nbsp;</small></p>
+</div>    
+    
+<div class="container">
+
+	<div class="row">
+		<div class="col-md-4 col-lg-4 col-sm-4">
+			<div class="panel panel-default">
+				<div class="panel-heading">온습도</div>
+				<div class="panel-body">
+					<div class="row">
+						<div id="thermometer" style="margin:10px auto"></div>
+					</div>
+					<div class="row">
+						<div id="hygrometer"  style="margin:10px auto"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-md-4 col-lg-4 col-sm-4" >
+			<div class="panel panel-default">
+				<div class="panel-heading">액츄에이터</div>
+				<div class="panel-body">
+					<div class="row">
+							<div class="col-md-6 col-lg-6 col-sm-12 col-xs-6">
+								<div class="form-group">
+									<label for="chkLED" class="control-label">LED</label> 
+									<input type="checkbox" id="chkLED" value="L2" />
+								</div>
+								<div class="form-group">
+									<label for="chkAc" class=" control-label">음악</label>
+									<input type="checkbox" id="chkAudio" value="AC" />
+								</div>
+							</div>
+                        </div>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-md-4 col-lg-4 col-sm-4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">경보알림</div>
+                    <div class="panel-body">
+                        <div class="row">
+                                <span class="label label-default arduino-alert-bar" id="alert-approach">접근감지</span>
+                                <span class="label label-default arduino-alert-bar" id="alert-intrusion">화재감지</span>
+                        </div>
+                    </div>
+                </div>
+		</div>
+	</div>
+</div>
+</body>
+</html>
